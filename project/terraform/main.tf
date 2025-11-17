@@ -80,11 +80,12 @@ resource "google_compute_instance_template" "php_template" {
   }
 
   metadata = {
+    # IMPORTANT: Dynamic image tag from Jenkins
     "gce-container-declaration" = <<EOF
 spec:
   containers:
   - name: php-app
-    image: "us-central1-docker.pkg.dev/${var.project_id}/demo-1/kandula:v2"
+    image: "us-central1-docker.pkg.dev/${var.project_id}/${var.repo}/${var.image_name}:${var.tag}"
     ports:
       - containerPort: 80
         hostPort: 80
@@ -169,11 +170,11 @@ resource "google_compute_target_http_proxy" "php_proxy" {
 }
 
 resource "google_compute_global_forwarding_rule" "php_forward_rule" {
-  name       = "php-forwarding-rule"
-  target     = google_compute_target_http_proxy.php_proxy.id
-  port_range = "80"
+  name        = "php-forwarding-rule"
+  target      = google_compute_target_http_proxy.php_proxy.id
+  port_range  = "80"
   ip_protocol = "TCP"
-  ip_address = google_compute_global_address.php_lb_ip.address
+  ip_address  = google_compute_global_address.php_lb_ip.address
 }
 
 # ---------------------------------------------------------
