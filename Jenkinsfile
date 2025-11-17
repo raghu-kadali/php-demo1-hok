@@ -2,11 +2,13 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_ID = "hari-chandu-anunay"
+        PROJECT_ID = "kubernetes-477004"
         REGION     = "us-central1"
-        REPO       = "demo-1"
-        IMAGE_NAME = "kandula"
-        TAG        = "v2"
+        REPO       = "php-app-repo"
+        IMAGE_NAME = "php-app"
+
+        // Unique Docker tag for every build → required for MIG redeploy
+        TAG        = "${env.BUILD_NUMBER}"
     }
 
     stages {
@@ -15,7 +17,7 @@ pipeline {
             steps {
                 echo "Pulling code from GitHub..."
                 git(
-                    url: 'https://github.com/Gowtham0928/php-demo1.git',
+                    url: 'https://github.com/raghu-kadali/php-app.git',
                     branch: 'main'
                 )
             }
@@ -61,7 +63,7 @@ pipeline {
                 sh """
                 cd project/terraform
                 terraform init
-                terraform apply -auto-approve
+                terraform apply -var="tag=${TAG}" -auto-approve
                 """
             }
         }
